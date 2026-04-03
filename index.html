@@ -358,12 +358,30 @@ h1 { font-family: 'Parisienne', cursive; }
 
 
 <!-- Floating RSVP Button -->
-<a href="https://forms.gle/foPcJt6hmMzy6X5s8" 
-   target="_blank" 
-   rel="noopener noreferrer"
+<!-- Floating Play/Pause Button -->
+<button id="music-toggle"
    class="fixed bottom-6 right-6 bg-green-600 text-white font-lato px-6 py-3 rounded-full shadow-lg hover:bg-green-700 transition z-50">
-  RSVP
-</a>
+  ▶ Play
+</button>
+
+<!-- Audio element -->
+<audio id="bg-music" src="bgsax.mp3" preload="auto" loop></audio>
+
+<script>
+  const audio = document.getElementById("bg-music");
+  const toggleBtn = document.getElementById("music-toggle");
+
+  toggleBtn.addEventListener("click", function () {
+    if (audio.paused) {
+      audio.play();
+      toggleBtn.textContent = "⏸ Pause";
+    } else {
+      audio.pause();
+      toggleBtn.textContent = "▶ Play";
+    }
+  });
+</script>
+
 
 <!-- RSVP Section -->
 <section id="rsvp" class="py-20 w-full bg-white text-center font-lato">
