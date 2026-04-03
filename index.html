@@ -39,9 +39,17 @@ h1 { font-family: 'Parisienne', cursive; }
   </style>
 </head>
 <body>
+<!-- Overlay -->
 <div id="overlay" class="fixed inset-0 bg-black flex flex-col items-center justify-center text-white z-50 transition-opacity duration-700">
   <p class="mt-6 text-sm">Click to view</p>
 </div>
+
+<!-- Floating Play/Pause Button -->
+<button id="music-toggle"
+   class="fixed bottom-6 right-6 bg-green-600 text-white font-lato px-6 py-3 rounded-full shadow-lg hover:bg-green-700 transition z-50"
+   style="display:none;">
+  ⏸ Pause
+</button>
 
 <!-- Player container -->
 <div id="player"></div>
@@ -56,42 +64,58 @@ h1 { font-family: 'Parisienne', cursive; }
     player = new YT.Player('player', {
       height: '0',
       width: '0',
-      videoId: 'uYFxTczfT8g', // your new video ID
+      videoId: 'uYFxTczfT8g', // your video ID
       playerVars: {
         autoplay: 0,   // don’t autoplay yet
         controls: 0,
         loop: 1,
         playlist: 'uYFxTczfT8g',
-        start: 27       // start at 5 seconds
+        start: 27
       }
     });
   }
 
+  // Overlay click: fade out overlay, start music, show button
   document.getElementById("overlay").addEventListener("click", function () {
-    // Fade out overlay
     this.style.opacity = "0";
     setTimeout(() => {
       this.style.display = "none";
+      if (player && player.playVideo) {
+        player.playVideo();
+
+        // Fade in volume
+        let vol = 0;
+        player.setVolume(vol);
+        const fade = setInterval(() => {
+          if (vol < 70) {
+            vol += 5;
+            player.setVolume(vol);
+          } else {
+            clearInterval(fade);
+          }
+        }, 200);
+      }
+      // Show the toggle button in Pause state
+      document.getElementById("music-toggle").style.display = "block";
+      document.getElementById("music-toggle").textContent = "⏸ Pause";
     }, 700);
+  });
 
-    // Play video
-    if (player && player.playVideo) {
-      player.playVideo();
-
-      // Fade in volume
-      let vol = 0;
-      player.setVolume(vol);
-      const fade = setInterval(() => {
-        if (vol < 70) {
-          vol += 5; // increase by 5 each step
-          player.setVolume(vol);
-        } else {
-          clearInterval(fade);
-        }
-      }, 200); // every 200ms
+  // Play/Pause toggle
+  document.getElementById("music-toggle").addEventListener("click", function () {
+    if (player && player.getPlayerState) {
+      const state = player.getPlayerState();
+      if (state === YT.PlayerState.PLAYING) {
+        player.pauseVideo();
+        this.textContent = "▶ Play";
+      } else {
+        player.playVideo();
+        this.textContent = "⏸ Pause";
+      }
     }
   });
 </script>
+
 
 
   <!-- Section 1 -->
@@ -356,31 +380,6 @@ h1 { font-family: 'Parisienne', cursive; }
   });
 </script>
 
-
-<!-- Floating RSVP Button -->
-<!-- Floating Play/Pause Button -->
-<button id="music-toggle"
-   class="fixed bottom-6 right-6 bg-green-600 text-white font-lato px-6 py-3 rounded-full shadow-lg hover:bg-green-700 transition z-50">
-  ▶ Play
-</button>
-
-<!-- Audio element -->
-<audio id="bg-music" src="bgsax.mp3" preload="auto" loop></audio>
-
-<script>
-  const audio = document.getElementById("bg-music");
-  const toggleBtn = document.getElementById("music-toggle");
-
-  toggleBtn.addEventListener("click", function () {
-    if (audio.paused) {
-      audio.play();
-      toggleBtn.textContent = "⏸ Pause";
-    } else {
-      audio.pause();
-      toggleBtn.textContent = "▶ Play";
-    }
-  });
-</script>
 
 
 <!-- RSVP Section -->
